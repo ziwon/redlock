@@ -183,7 +183,12 @@ class RedLock(object):
             else:
                 for node in self.redis_nodes:
                     self.release_node(node)
-                time.sleep(random.randint(0, self.retry_delay) / 1000)
+
+                validity -= self.retry_delay
+                if validity > 0:
+                    time.sleep(self.retry_delay/1000)
+                else:
+                    RedLockError('Timeout error while trying to acquire lock')
         return False, 0
 
     def release(self):
